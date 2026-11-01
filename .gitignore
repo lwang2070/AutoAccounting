@@ -17,3 +17,4 @@ local.properties
 /app/lspatch/release/*
 /app/lspatch/base.apk
 /.cursor
+.claude/worktrees/
