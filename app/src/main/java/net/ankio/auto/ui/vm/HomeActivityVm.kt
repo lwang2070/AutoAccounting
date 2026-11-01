@@ -95,10 +95,14 @@ class HomeActivityVm : ViewModel() {
         if (fromUser) ToastUtils.info(R.string.check_update)
         viewModelScope.launch {
             val result = AppUpdateHelper.check()
-            if (result != null) {
-                appUpdateModel.value = result
-            } else if (fromUser) {
-                ToastUtils.error(R.string.no_need_to_update)
+            val update = result.getOrNull()
+            when {
+                update != null -> appUpdateModel.value = update
+                // 网络失败和「确实没有新版本」分开提示，避免把失败说成已是最新
+                fromUser -> ToastUtils.error(
+                    if (result.isFailure) R.string.check_update_failed
+                    else R.string.no_need_to_update
+                )
             }
         }
     }

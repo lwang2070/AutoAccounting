@@ -51,8 +51,9 @@ materialThemeBuilder {
     generatePalette = true
 }
 
-val appVersionCode = calculateVersionCode()
-val appVersionName = "4.0.2"
+// 发布时 CI 用 -PappVersionName=<tag 去掉 v> 传进来；本地编译用默认值。
+val appVersionName = (findProperty("appVersionName") as String?) ?: "4.0.2"
+val appVersionCode = calculateVersionCode(appVersionName)
 
 // CI 通过环境变量注入发布签名。本地没有这些变量时回退到 debug 签名，
 // 这样开发机不配密钥也能正常编。
@@ -184,12 +185,20 @@ android {
     }
 
 }
-fun calculateVersionCode(): Int {
+fun calculateVersionCode(versionName: String): Int {
+    // 位数分配：年年 月月 日日 次版本(3 位) 修订(3 位)。
+    // 例：2026-11-01 发布 4.0.3 → 271100003。
+    // 原来只有日期，同一天发两个版本会撞号，App 会认为没有新版本。
+    // 日期在前保证「后发的版本号更大」，版本号在后保证同一天的先后顺序。
+    // 上限 1006099999，低于安卓要求的 2100000000。
     val calendar = Calendar.getInstance()
-    val year = calendar.get(Calendar.YEAR)
+    val year = calendar.get(Calendar.YEAR) % 100
     val month = calendar.get(Calendar.MONTH) + 1
     val day = calendar.get(Calendar.DAY_OF_MONTH)
-    return year * 10000 + month * 100 + day
+    val parts = versionName.removePrefix("v").split(".")
+    val minor = parts.getOrNull(1)?.toIntOrNull() ?: 0
+    val patch = parts.getOrNull(2)?.toIntOrNull() ?: 0
+    return (year * 10000000) + (month * 1000000) + (day * 100000) + (minor * 1000) + patch
 }
 
 configurations.configureEach {
@@ -262,7 +271,6 @@ dependencies {
 
     implementation(libs.glide)
 
-    implementation(libs.bugly)
     implementation(libs.mmkv)
     implementation(libs.zip4j)
     implementation(kotlin("reflect"))

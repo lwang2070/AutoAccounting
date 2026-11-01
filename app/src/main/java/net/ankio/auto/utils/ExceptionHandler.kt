@@ -3,7 +3,6 @@ package net.ankio.auto.utils
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.tencent.bugly.crashreport.CrashReport
 import net.ankio.auto.BuildConfig
 import net.ankio.auto.autoApp
 import net.ankio.auto.storage.Logger
@@ -83,9 +82,6 @@ class ExceptionHandler private constructor(private val context: Context) :
         val msg = buildExceptionLog(e, "主线程未捕获异常")
         Logger.e("Handler UncaughtException", e)
         saveLogToLocal(context, msg)
-        // Bugly 上报
-        if (!PrefManager.debugMode)
-            CrashReport.postCatchedException(e)
 
         // 跳转错误界面
         try {

@@ -16,9 +16,7 @@
 package net.ankio.auto
 
 import android.app.Application
-import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
-import com.tencent.bugly.crashreport.CrashReport
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -80,7 +78,7 @@ open class App : Application() {
         MMKV.initialize(this)
         // 初始化核心组件（优先初始化PrefManager以获取用户设置）
         initSystemComponents()
-        initBuglyIfRelease()
+        ExceptionHandler.init(this)
         initUI()
         initNetwork()
         BillExportSignal.register { BillExportScheduler.enqueueImmediate(this) }
@@ -94,16 +92,6 @@ open class App : Application() {
         SystemUtils.init(this)
     }
 
-
-    /**
-     * 非调试模式下初始化Bugly
-     */
-    private fun initBuglyIfRelease() {
-        ExceptionHandler.init(this)
-        if (!PrefManager.debugMode) {
-            initBugly()
-        }
-    }
 
     /**
      * 初始化UI相关
@@ -153,23 +141,4 @@ open class App : Application() {
         createConfigurationContext(config)
     }
 
-    /**
-     * 初始化Bugly崩溃收集
-     */
-    private fun initBugly() {
-
-
-        val strategy = CrashReport.UserStrategy(this).apply {
-            appVersion = BuildConfig.VERSION_NAME
-            appPackageName = BuildConfig.APPLICATION_ID
-            deviceModel = "${Build.BRAND} ${Build.MODEL}"
-        }
-
-        CrashReport.initCrashReport(
-            this,
-            "af9e0f4181",
-            PrefManager.debugMode,
-            strategy
-        )
-    }
 }

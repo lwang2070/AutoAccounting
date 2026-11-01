@@ -48,7 +48,6 @@ htmlKtx = "1.1.2"
 
 # Image Loading
 glide = "4.16.0"
-bugly = "4.1.9.3"
 mmkv = "2.3.0"
 zip4j = "2.11.5"
 
@@ -120,7 +119,6 @@ html-ktx = { module = "dev.rikka.rikkax.html:html-ktx", version.ref = "htmlKtx" 
 # Image Loading
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 glideCompiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
-bugly = { module = "com.tencent.bugly:crashreport", version.ref = "bugly" }
 mmkv = { module = "com.tencent:mmkv-static", version.ref = "mmkv" }
 zip4j = { module = "net.lingala.zip4j:zip4j", version.ref = "zip4j" }
 

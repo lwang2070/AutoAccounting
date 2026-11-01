@@ -241,6 +241,7 @@
     <string name="loading_logs">打包日志…</string>
     <string name="no_need_to_update">无需更新。长按强制更新。</string>
     <string name="check_update">检查更新…</string>
+    <string name="check_update_failed">检查更新失败，请检查网络后重试。</string>
     <string name="delete_bill_message">您确定要删除此账单吗？</string>
     <string name="delete_data_message">您确定要删除此数据吗？</string>
     <string name="copy">复制</string>

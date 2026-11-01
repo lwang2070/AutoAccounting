@@ -254,6 +254,7 @@
     <string name="loading_logs">Packing logs…</string>
     <string name="no_need_to_update">No update needed. Long press to force update.</string>
     <string name="check_update">Checking for updates…</string>
+    <string name="check_update_failed">Update check failed. Check your network and try again.</string>
     <string name="delete_bill_message">Are you sure you want to delete this bill?</string>
     <string name="delete_data_message">Are you sure you want to delete this data?</string>
     <string name="copy">Copy</string>
