@@ -54,6 +54,10 @@ materialThemeBuilder {
 val appVersionCode = calculateVersionCode()
 val appVersionName = "4.0.2"
 
+// CI 通过环境变量注入发布签名。本地没有这些变量时回退到 debug 签名，
+// 这样开发机不配密钥也能正常编。
+val releaseKeystorePath: String? = System.getenv("KEYSTORE_FILE")
+
 base {
     archivesName.set("app-$appVersionName($appVersionCode)")
 }
@@ -85,6 +89,17 @@ android {
         aidl = true
     }
 
+    signingConfigs {
+        if (releaseKeystorePath != null) {
+            create("release") {
+                storeFile = file(releaseKeystorePath)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         getByName("debug") {
             ndk {
@@ -100,7 +115,15 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            // 自动更新要求每次签名一致。CI 里没给密钥就直接失败，
+            // 免得编出装不上的包还发出去；本地开发允许回退到 debug 签名。
+            if (releaseKeystorePath == null) {
+                if (System.getenv("CI") == "true") {
+                    throw GradleException("CI 环境必须提供 KEYSTORE_FILE，拒绝用 debug 签名产出发布包")
+                }
+                logger.warn("未设置 KEYSTORE_FILE，release 包使用 debug 签名，无法覆盖已安装的正式版")
+            }
+            signingConfig = signingConfigs.getByName(if (releaseKeystorePath != null) "release" else "debug")
         }
     }
 
