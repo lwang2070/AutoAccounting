@@ -24,10 +24,16 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - uses: android-actions/setup-android@v3
-
+      # 不用 android-actions/setup-android：它会去装一个叫 tools 的老包，
+      # 新版 cmdline-tools 里已经没有了，直接报 exit code 1。
+      # ubuntu-latest 自带 Android SDK 和 cmdline-tools，直接用。
       - name: Install Android SDK 36
-        run: sdkmanager "platforms;android-36" "build-tools;35.0.0"
+        run: |
+          set -euo pipefail
+          sdkmanager="$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | sort -V | tail -1)"
+          # || true 是用来吃掉 yes 被 SIGPIPE 杀掉的 141，别删。
+          (yes || true) | "$sdkmanager" --licenses > /dev/null
+          "$sdkmanager" "platforms;android-36" "build-tools;35.0.0"
 
       - uses: gradle/actions/setup-gradle@v4
 
